@@ -1,12 +1,12 @@
-#!/usr/bin/python
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+#!/usr/bin/python3
 
 import time
+import http.server
 import re
 
 from prometheus_client import start_http_server, Summary
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily, REGISTRY
+from prometheus_client.exposition import MetricsHandler
 
 
 #class EthtoolCollector(object):
@@ -82,6 +82,9 @@ def find_physical_interfaces():
 
 if __name__ == "__main__":
     REGISTRY.register(EthtoolCollector())
-    start_http_server(8000)
-    while True:
-        time.sleep(1)
+
+    httpd = http.server.HTTPServer(
+        ("", 8000),
+        MetricsHandler
+    )
+    httpd.serve_forever()

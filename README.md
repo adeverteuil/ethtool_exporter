@@ -1,5 +1,5 @@
-ethtool_exporter
-================
+ethtool\_exporter
+=================
 
 A Prometheus exporter for statistics from NIC drivers exposed by
 `ethtool -S <interface>`.
@@ -31,6 +31,7 @@ Debian 8+, I'd create a systemd unit file instead.
           name: prometheus_client
           state: present
           virtualenv: /opt/ethtool_exporter/virtualenv
+          virtualenv_python: python3.4
 
       - name: install ethtool_exporter
         copy:
@@ -75,7 +76,7 @@ Debian 8+, I'd create a systemd unit file instead.
 Developing
 ==========
 
-    pyenv virtualenv ethtool_exporter  # Create a virtualenv.
+    pyenv virtualenv -p python3 ethtool_exporter  # Create a virtualenv.
     pyenv local ethtool_exporter       # Set the Python version for the CWD to it.
     pyenv activate ethtool_exporter    # Now activate the virtualenv.
     pip install -r requirements.txt    # Install dependencies.
@@ -92,3 +93,5 @@ Useful references
 
  * https://prometheus.io/docs/instrumenting/writing_exporters/
  * https://github.com/prometheus/client_python#custom-collectors
+
+Some snippets are based on [CloudAndHeat/prometheus_smart_exporter](https://github.com/CloudAndHeat/prometheus_smart_exporter).

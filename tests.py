@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+#!/usr/bin/python3
 
 import unittest
 
@@ -14,7 +12,7 @@ class StatsParserTestCase(unittest.TestCase):
     def setUp(self):
         self.collector = EthtoolCollector()
         with open("sample.txt") as f:
-            self.collector.fake_data = f.read().decode("UTF-8", errors="replace")
+            self.collector.fake_data = f.read()
 
     def test_parse_line_rx_no_dma_resources(self):
         stat = self.collector.parse_line("   rx_no_dma_resources: 590843871")
@@ -35,11 +33,11 @@ class StatsParserTestCase(unittest.TestCase):
     def test_parse_stats(self):
         self.collector.fake_data = "   rx_no_dma_resources: 590843871\n"
         self.collector.fake_data += "   tx_queue_5_bytes: 1467719549558\n"
-        generator = self.collector.collect()
-        metric = generator.next()
+        metrics = self.collector.collect()
+        metric = next(metrics)
         expected = CounterMetricFamily("ethtool_rx_no_dma_resources", "help text", 590843871.0)
         self.assertEqual(expected, metric)
-        metric = generator.next()
+        metric = next(metrics)
         expected = CounterMetricFamily("ethtool_tx_queue_bytes", "help text", labels=("queue",))
         expected.add_metric((u"5",), 1467719549558.0)
         self.assertEqual(expected, metric)
