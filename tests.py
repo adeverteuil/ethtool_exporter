@@ -52,3 +52,6 @@ def find_physical_interfaces():
         if os.path.islink(path) and "virtual" not in os.readlink(path):
             yield file
 
+
+if __name__ == "__main__":
+    unittest.main()
