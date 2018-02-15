@@ -32,12 +32,10 @@ class StatsParser(object):
         re.VERBOSE
         )
 
-    def parse_stats(self, data):
-        stats = []
+    def collect(self, data):
         for line in data.splitlines():
             if self.item_is_interesting(line):
-                stats.append(self.parse_line(line))
-        return stats
+                yield self.parse_line(line)
 
     def item_is_interesting(self, item):
         return self.interesting_items.match(item)
@@ -55,4 +53,3 @@ class StatsParser(object):
             item = "queue_{}".format(queue_match.group(3))
         item = "ethtool_" + item
         return (item, int(value), tags)
-

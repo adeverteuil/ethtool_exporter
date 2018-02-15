@@ -31,7 +31,7 @@ class StatsParserTestCase(unittest.TestCase):
         self.assertEqual(expected, stat)
 
     def test_parse_stats(self):
-        stats = self.sp.parse_stats(self.testdata)
+        stats = list(self.sp.collect(self.testdata))
         expected = ("ethtool_rx_no_dma_resources", 590843871, [])
         self.assertIn(expected, stats)
         expected = (
