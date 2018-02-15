@@ -34,7 +34,7 @@ Debian 8+, I'd create a systemd unit file instead.
 
     - name: install ethtool_exporter
       copy:
-        src: ethtool_exporter.py
+        url: https://raw.githubusercontent.com/adeverteuil/ethtool_exporter/master/ethtool_exporter.py
         dest: /opt/ethtool_exporter/ethtool_exporter
         mode: 0744
 
