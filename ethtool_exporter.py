@@ -100,7 +100,7 @@ if __name__ == "__main__":
     try:
         REGISTRY.register(EthtoolCollector())
         httpd = http.server.HTTPServer(
-            ("", 8000),
+            ("", 9417),
             MetricsHandler,
             )
         httpd.serve_forever()
