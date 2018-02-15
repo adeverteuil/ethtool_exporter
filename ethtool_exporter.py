@@ -20,7 +20,7 @@ from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily, REGIS
 #
 #REGISTRY.register(CustomCollector())
 
-class StatsParser(object):
+class EthtoolCollector(object):
 
     interesting_items = re.compile(
         r"""\W*(

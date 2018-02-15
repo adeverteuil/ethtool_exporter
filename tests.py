@@ -12,14 +12,14 @@ class StatsParserTestCase(unittest.TestCase):
     def setUp(self):
         with open("sample.txt") as f:
             self.testdata = f.read().decode("UTF-8", errors="replace")
-        self.sp = StatsParser()
+        self.collector = EthtoolCollector()
 
     def test_parse_line_rx_no_dma_resources(self):
-        stat = self.sp.parse_line("   rx_no_dma_resources: 590843871")
+        stat = self.collector.parse_line("   rx_no_dma_resources: 590843871")
         self.assertEqual(("ethtool_rx_no_dma_resources", 590843871, []), stat)
 
     def test_parse_queue_bytes_line(self):
-        stat = self.sp.parse_line("     tx_queue_5_bytes: 1467719549558")
+        stat = self.collector.parse_line("     tx_queue_5_bytes: 1467719549558")
         expected = (
             "ethtool_queue_bytes",
             1467719549558,
@@ -31,7 +31,7 @@ class StatsParserTestCase(unittest.TestCase):
         self.assertEqual(expected, stat)
 
     def test_parse_stats(self):
-        stats = list(self.sp.collect(self.testdata))
+        stats = list(self.collector.collect(self.testdata))
         expected = ("ethtool_rx_no_dma_resources", 590843871, [])
         self.assertIn(expected, stats)
         expected = (
