@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import time
 import re
 
 from prometheus_client import start_http_server, Summary
@@ -32,27 +33,42 @@ class EthtoolCollector(object):
         re.VERBOSE
         )
 
-    def collect(self, data):
-        for line in data.splitlines():
+    def __init__(self):
+        self.fake_data = None
+
+    def read_ethtool_statistics(self):
+        if self.fake_data is not None:
+            return self.fake_data
+        else:
+            return "   rx_no_dma_resources: 590843871\n"
+
+    def collect(self):
+        self.metric_families = {}
+        for line in self.read_ethtool_statistics().splitlines():
             if self.item_is_interesting(line):
-                yield self.parse_line(line)
+                metric, family, value, labels = self.parse_line(line)
+                if metric not in self.metric_families:
+                    self.metric_families[metric] = family(metric, "help text", labels=labels.keys())
+                self.metric_families[metric].add_metric(labels.values(), value)
+        for metric in self.metric_families:
+            yield self.metric_families[metric]
 
     def item_is_interesting(self, item):
         return self.interesting_items.match(item)
 
     def parse_line(self, line):
-        tags = []
+        labels = {}
         stat_match = re.match(r"\W+(\w+): (\d+)", line)
         item, value = stat_match.group(1), stat_match.group(2)
         queue_match = re.match(r"(tx|rx)_queue_(\d+)_(bytes|packets)", item)
         if queue_match:
-            tags = [
-                ('direction', queue_match.group(1)),
-                ('queue', queue_match.group(2)),
-                ]
-            item = "queue_{}".format(queue_match.group(3))
-        item = "ethtool_" + item
-        return (item, int(value), tags)
+            labels = {
+                'queue': queue_match.group(2),
+                }
+            item = "{}_queue_{}".format(queue_match.group(1), queue_match.group(3))
+        metric_name = "ethtool_" + item
+        metric_type = CounterMetricFamily  # They're all counters.
+        return (metric_name, metric_type, float(value), labels)
 
 
 def find_physical_interfaces():
@@ -62,3 +78,10 @@ def find_physical_interfaces():
         path = os.path.join(root, file)
         if os.path.islink(path) and "virtual" not in os.readlink(path):
             yield file
+
+
+if __name__ == "__main__":
+    REGISTRY.register(EthtoolCollector())
+    start_http_server(8000)
+    while True:
+        time.sleep(1)
