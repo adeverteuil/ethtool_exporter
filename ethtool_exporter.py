@@ -50,16 +50,16 @@ class EthtoolCollector(object):
                 #    )
         for line in data.splitlines():
             if self.item_is_interesting(line):
-                name, labels, value  = self.parse_line(line)
+                name, documentation, labels, value  = self.parse_line(line)
                 labels.insert(0, ("interface", interface))
-                self.add_metric(name, labels, value)
+                self.add_metric(name, documentation, labels, value)
 
-    def add_metric(self, name, labels, value):
+    def add_metric(self, name, documentation, labels, value):
         if name not in self.metric_families:
             label_names = [label[0] for label in labels]
             self.metric_families[name] = CounterMetricFamily(
                 name,
-                "help text",
+                documentation,
                 labels=label_names
                 )
         label_values = [label[1] for label in labels]
@@ -72,6 +72,7 @@ class EthtoolCollector(object):
         labels = []
         stat_match = re.match(r"\W+(\w+): (\d+)", line)
         item, value = stat_match.group(1), stat_match.group(2)
+        documentation = item
         queue_match = re.match(r"(tx|rx)_queue_(\d+)_(bytes|packets)", item)
         if queue_match:
             labels.append(('queue', queue_match.group(2)))
@@ -79,8 +80,12 @@ class EthtoolCollector(object):
                 queue_match.group(1),
                 queue_match.group(3)
                 )
-        name = "ethtool_" + item
-        return (name, labels, float(value))
+            documentation = "{}_queue_N_{}".format(
+                queue_match.group(1),
+                queue_match.group(3)
+                )
+        name = "ethtool_" + item + "_total"
+        return (name, documentation, labels, float(value))
 
     def find_physical_interfaces(self):
         # https://serverfault.com/a/833577/393474
