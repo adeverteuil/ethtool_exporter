@@ -1,0 +1,48 @@
+Useful references
+=================
+
+https://prometheus.io/docs/instrumenting/writing_exporters/
+https://github.com/prometheus/client_python#custom-collectors
+
+
+Ansible
+=======
+
+  - name: install virtualenv
+    apt:
+      name: python-virtualenv
+      state: present
+
+  - name: create the /opt/ethtool_exporter directory
+    file:
+      dest: /opt/ethtool_exporter
+      state: directory
+
+  - name: install prometheus_client
+    pip:
+      name: prometheus_client
+      state: present
+      virtualenv: /opt/ethtool_exporter/virtualenv
+
+  - name: install ethtool_exporter
+    copy:
+      src: ethtool_exporter.py
+      dest: /opt/ethtool_exporter/ethtool_exporter
+      mode: 0744
+
+  - name: create the ethtool_exporter user
+    user:
+      name: ethtool_exporter
+      state: present
+      system: yes
+
+
+Supervisor
+==========
+
+Changer le PATH pour être dans le virtualenv.
+
+    [program:ethtool_exporter]
+    command = /opt/ethtool_exporter/ethtool_exporter
+    environment = PATH="/opt/ethtool_exporter/virtualenv/bin:%(ENV_PATH)s",VIRTUAL_ENV="/opt/ethtool_exporter/virtualenv"
+    user = ethtool_exporter
