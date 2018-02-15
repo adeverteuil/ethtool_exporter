@@ -44,14 +44,6 @@ class StatsParserTestCase(unittest.TestCase):
             )
         self.assertIn(expected, stats)
 
-def find_physical_interfaces():
-    # https://serverfault.com/a/833577/393474
-    root = "/sys/class/net"
-    for file in os.listdir(root):
-        path = os.path.join(root, file)
-        if os.path.islink(path) and "virtual" not in os.readlink(path):
-            yield file
-
 
 if __name__ == "__main__":
     unittest.main()

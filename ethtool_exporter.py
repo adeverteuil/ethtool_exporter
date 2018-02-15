@@ -53,3 +53,12 @@ class StatsParser(object):
             item = "queue_{}".format(queue_match.group(3))
         item = "ethtool_" + item
         return (item, int(value), tags)
+
+
+def find_physical_interfaces():
+    # https://serverfault.com/a/833577/393474
+    root = "/sys/class/net"
+    for file in os.listdir(root):
+        path = os.path.join(root, file)
+        if os.path.islink(path) and "virtual" not in os.readlink(path):
+            yield file
