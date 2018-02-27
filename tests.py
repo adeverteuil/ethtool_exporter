@@ -13,6 +13,8 @@ class StatsParserTestCase(unittest.TestCase):
         self.collector = EthtoolCollector()
         with open("sample.txt") as f:
             self.fake_data = f.read()
+        with open("sample_info.txt") as f:
+            self.fake_info = f.read()
 
     def test_parse_line_rx_no_dma_resources(self):
         stat = self.collector.parse_line("   rx_no_dma_resources: 590843871")
@@ -37,7 +39,7 @@ class StatsParserTestCase(unittest.TestCase):
         self.assertEqual(expected, stat)
 
     def test_parse_stats(self):
-        metrics = list(self.collector.collect(self.fake_data))
+        metrics = list(self.collector.collect(self.fake_data, self.fake_info))
         expected = CounterMetricFamily(
             "ethtool_rx_no_dma_resources_total",
             "rx_no_dma_resources",
@@ -54,6 +56,8 @@ class StatsParserTestCase(unittest.TestCase):
         for m in metrics:
             if m.name == "ethtool_tx_queue_bytes_total":
                 self.assertIn(expected.samples[0], m.samples)
+            if m.name == "ethtool_interface_speed":
+                self.assertEqual(m.samples[0][2], 1048576000.0)
 
 
 if __name__ == "__main__":
