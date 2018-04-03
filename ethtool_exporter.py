@@ -39,15 +39,17 @@ class EthtoolCollector(object):
             data = test_data
         else:
             try:
-                data = subprocess.check_output(["ethtool", "-S", interface]).decode()
+                data = subprocess.check_output(
+                    ["ethtool", "-S", interface],
+                    ).decode()
             except subprocess.CalledProcessError as err:
-                pass
-                #logger.error(
-                #    "ethtool returned {} for interface {}".format(
-                #        err.returncode,
-                #        interface
-                #        )
-                #    )
+                logging.error(
+                    "ethtool returned {} for interface {}".format(
+                        err.returncode,
+                        interface
+                        )
+                    )
+                sys.exit()
         for line in data.splitlines():
             if self.item_is_interesting(line):
                 name, documentation, labels, value  = self.parse_line(line)
