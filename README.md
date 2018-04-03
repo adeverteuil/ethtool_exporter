@@ -93,5 +93,6 @@ Useful references
 
  * https://prometheus.io/docs/instrumenting/writing_exporters/
  * https://github.com/prometheus/client_python#custom-collectors
+ * https://github.com/prometheus/prometheus/wiki/Default-port-allocations
 
 Some snippets are based on [CloudAndHeat/prometheus_smart_exporter](https://github.com/CloudAndHeat/prometheus_smart_exporter).
